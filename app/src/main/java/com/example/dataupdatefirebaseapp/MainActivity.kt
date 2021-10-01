@@ -6,12 +6,14 @@ import android.widget.Toast
 import androidx.appcompat.app.ActionBar
 import com.example.dataupdatefirebaseapp.databinding.ActivityMainBinding
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.lang.StringBuilder
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,6 +31,32 @@ class MainActivity : AppCompatActivity() {
 
             val person = Person(firstName,lastName, age)
             savePerson(person)
+        }
+
+        binding.button1.setOnClickListener {
+            retrievePersons()
+        }
+    }
+
+    private fun retrievePersons() = CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val querySnapshot = personCollectionRef.get().await()
+            val sb = StringBuilder()
+            for(document in querySnapshot.documents) {
+                val person = document.toObject<Person>()
+                sb.append("$person\n")
+            }
+            withContext(Dispatchers.Main){
+                binding.tvPersons.text = sb.toString()
+            }
+
+        }catch (e:java.lang.Exception){
+            withContext(Dispatchers.Main){
+                Toast.makeText(this@MainActivity,e.message, Toast.LENGTH_LONG).show()
+
+            }
+
+
         }
     }
 
