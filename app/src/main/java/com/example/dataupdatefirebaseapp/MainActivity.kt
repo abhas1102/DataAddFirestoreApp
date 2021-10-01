@@ -44,7 +44,9 @@ class MainActivity : AppCompatActivity() {
             val sb = StringBuilder()
             for(document in querySnapshot.documents) {
                 val person = document.toObject<Person>()
-                sb.append("$person\n")
+               // sb.append("$person\n")
+
+                sb.append("${person?.firstName} ${person?.lastName} ${person?.age}\n")
             }
             withContext(Dispatchers.Main){
                 binding.tvPersons.text = sb.toString()
